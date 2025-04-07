@@ -19,7 +19,7 @@ To bridge the gap between theory and practice in cybersecurity education, we are
 ### 1️⃣ Clone the project
 
 ```bash
-git clone [https://github.com/your-username/rag-pipeline.git](https://github.com/rsmymc/cve_rag_pipline.git)
+git clone https://github.com/rsmymc/cve_rag_pipline.git
 cd cve_rag-pipeline
 ```
 
@@ -95,7 +95,7 @@ Generates cybersecurity highlights from a lecture, finds a matching CVE, and pro
 | `use_existing_highlights` | If `true`, the API will reuse cached highlights and labs if they exist     |
 
 > 🧠 If `use_existing_highlights` is `true`, the API checks for these files:
-> - `highlights/<lecture_name>_highlights.json`
+> - `lecture_outputs/<lecture_name>_highlights.json`
 > - `lecture_outputs/<lecture_name>_labs.json`
 >
 > If found, it **skips Ollama generation and Chroma queries**, returning the cached lab result instantly.
@@ -160,7 +160,6 @@ The following diagram shows the full pipeline for transforming lecture content i
 | `chroma_data/`      | Persisted ChromaDB storage               |
 | `cyberlab-api/`     | Flask API service for highlight + lab gen |
 | `chroma-indexer/`   | Indexing pipeline for CVEs into ChromaDB |
-| `highlights/`       | Raw highlights per lecture               |
 | `lecture_outputs/`  | Final enriched highlights + labs         |
 
 ---

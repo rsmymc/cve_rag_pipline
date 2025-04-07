@@ -6,9 +6,9 @@ To bridge the gap between theory and practice in cybersecurity education, we are
 
 ## 💪 Features
 
-- 🧠 **Highlight generation** using Ollama + Mistral
+- 🧠 **Highlight generation** using Ollama (defaults to Mistral, supports optional models like LLaMA2/LLaMA3)
 - 🛡️ **CVE matching** using ChromaDB (MiniLM embeddings)
-- 🧪 **Lab builder** that returns vulnerable code + Dockerfile
+- 🧪 **Lab builder** vulnerable code, fixed version, and Dockerfile
 - 📎 Fully containerized with Docker Compose
 - 📝 API-first with Flask server
 
@@ -19,8 +19,8 @@ To bridge the gap between theory and practice in cybersecurity education, we are
 ### 1️⃣ Clone the project
 
 ```bash
-git clone https://github.com/your-username/rag-pipeline.git
-cd rag-pipeline
+git clone [https://github.com/your-username/rag-pipeline.git](https://github.com/rsmymc/cve_rag_pipline.git)
+cd cve_rag-pipeline
 ```
 
 ### 2️⃣ Set up environment variables

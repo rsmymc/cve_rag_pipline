@@ -11,6 +11,7 @@ until (echo > /dev/tcp/localhost/11434) >/dev/null 2>&1; do
 done
 echo "✅ Ollama is ready."
 
+IFS=','
 # Step 3: Pull models
 DEFAULT_MODELS=${DEFAULT_OLLAMA_MODELS:-mistral}
 for model in $DEFAULT_MODELS; do

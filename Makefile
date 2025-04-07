@@ -21,10 +21,14 @@ logs-indexer:
 run-indexer:
 	docker exec -it chroma-indexer python indexer.py
 
+restart-ollama:
+	docker compose rm -sf ollama
+	docker compose up ollama
+
 # === Cleanup ===
 clean:
 	docker-compose down -v
-	rm -rf chroma_data
+	docker container prune -f
 
 # === Ollama Commands ===
 pull:

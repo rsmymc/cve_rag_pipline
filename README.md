@@ -160,7 +160,6 @@ The following diagram shows the full pipeline for transforming lecture content i
 | `chroma_data/`      | Persisted ChromaDB storage               |
 | `cyberlab-api/`     | Flask API service for highlight + lab gen |
 | `chroma-indexer/`   | Indexing pipeline for CVEs into ChromaDB |
-| `highlights/`       | Raw highlights per lecture               |
 | `lecture_outputs/`  | Final enriched highlights + labs         |
 
 ---

@@ -1,11 +1,62 @@
-[
+ [
     {
-        "title": "Secure Coding Practices in Java",
-        "related_slides": [
-            "Learning Java",
-            "First Compilation"
-        ],
-        "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
-        "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code."
+      "title": "Secure Coding Practices in Java",
+      "related_slides": ["Learning Java", "First Compilation"],
+      "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
+      "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code."
+    },
+    {
+      "title": "The Risks of Hardcoded Secrets in Code",
+      "related_slides": ["First Compilation", "Project One"],
+      "discussion": "Discuss why hardcoding passwords, API keys, or credentials in code is dangerous and how attackers can extract secrets from repositories.",
+      "lab_opportunity": "Provide an insecure Java program with a hardcoded API key and have students implement secure storage using environment variables or configuration files."
+    },
+    {
+      "title": "Version Control Security (Git Best Practices)",
+      "related_slides": ["Git Introduced & Used", "A Twist"],
+      "discussion": "Explain Git security best practices, including avoiding committing secrets, using signed commits, and securing `.git` directories.",
+      "lab_opportunity": "Have students review a repository history, find sensitive information committed by mistake, and remove it using `git rebase` or `git filter-branch`."
+    },
+    {
+      "title": "The Role of the Java Security Manager",
+      "related_slides": ["Learning Java"],
+      "discussion": "Discuss the deprecation of Java's Security Manager and its security implications, along with alternative security mechanisms in modern Java.",
+      "lab_opportunity": "Have students explore Java sandboxing techniques and enforce security policies on file access."
+    },
+    {
+      "title": "Command Line Security & Linux Hardening",
+      "related_slides": ["Why Linux?"],
+      "discussion": "Introduce Linux security best practices, including file permissions, sudo abuse, and SSH key-based authentication.",
+      "lab_opportunity": "Have students set proper file permissions on Java projects and configure SSH keys for secure remote access."
+    },
+    {
+      "title": "Secure Third-Party Library Management (Dependency Security)",
+      "related_slides": ["Library Management Introduced"],
+      "discussion": "Discuss why relying on outdated libraries is dangerous, how attackers exploit insecure dependencies, and how to check for vulnerable dependencies.",
+      "lab_opportunity": "Have students scan a Java project's dependencies for known vulnerabilities using OWASP Dependency-Check and update outdated packages."
+    },
+    {
+      "title": "Secure Object-Oriented Programming (OOP) Concepts",
+      "related_slides": ["Learning Java"],
+      "discussion": "Explain how OOP principles like encapsulation, inheritance, and polymorphism impact security, such as data leaks through public fields or method overriding risks.",
+      "lab_opportunity": "Provide an insecure Java class design and have students refactor it to follow secure encapsulation best practices."
+    },
+    {
+      "title": "The Dangers of Over-Reliance on AI Tools (LLMs & Code Security)",
+      "related_slides": ["A Double Twist"],
+      "discussion": "Discuss risks of AI-generated code, including how it can introduce security vulnerabilities like SQL injection or hardcoded secrets.",
+      "lab_opportunity": "Have students analyze AI-generated Java code for security flaws and rewrite it securely."
+    },
+    {
+      "title": "Java Deserialization Attacks",
+      "related_slides": ["Learning Java", "First Compilation"],
+      "discussion": "Explain how insecure deserialization can lead to remote code execution (RCE) in Java applications and discuss real-world vulnerabilities.",
+      "lab_opportunity": "Provide an insecure Java application that deserializes user input, have students exploit it, then fix it using secure serialization techniques."
+    },
+    {
+      "title": "Secure Software Development Lifecycle (SDLC) Awareness",
+      "related_slides": ["Skills Gap", "Proving Your Skillset"],
+      "discussion": "Introduce the importance of integrating security throughout software development, including threat modeling, secure coding, and security testing.",
+      "lab_opportunity": "Have students perform a basic threat model on their Java project, identifying potential risks and mitigations."
     }
-]
+  ]

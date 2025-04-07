@@ -1,20 +1,187 @@
 [
-    {
-        "title": "Secure Coding Practices in Java",
-        "related_slides": [
-            "Learning Java",
-            "First Compilation"
-        ],
-        "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
-        "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code.",
-        "cve_match": [
-            {
-                "page_content": "Description: Out-of-bounds Read vulnerability (CWE-125) was found in CX-Programmer. Attackers may be able to read sensitive information or cause an application crash by abusing this vulnerability.\nReferences: https://www.fa.omron.co.jp/product/security/assets/pdf/en/OMSR-2025-003_en.pdf, https://www.fa.omron.co.jp/product/security/assets/pdf/ja/OMSR-2025-003_ja.pdf",
-                "metadata": {
-                    "cve_id": "CVE-2025-0591",
-                    "source_file": "/app/cves/2025/0xxx/CVE-2025-0591.json"
+        {
+            "title": "Secure Coding Practices in Java",
+            "related_slides": [
+                "Learning Java",
+                "First Compilation"
+            ],
+            "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
+            "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code.",
+            "cve_match": [
+                {
+                    "page_content": "Description: Stack-based Buffer Overflow vulnerability in NEC Corporation Aterm WG1800HP4, WG1200HS3, WG1900HP2, WG1200HP3, WG1800HP3, WG1200HS2, WG1900HP, WG1200HP2, W1200EX(-MS), WG1200HS, WG1200HP, WF300HP2, W300P, WF800HP, WR8165N, WG2200HP, WF1200HP2, WG1800HP2, WF1200HP, WG600HP, WG300HP, WF300HP, WG1800HP, WG1400HP, WR8175N, WR9300N, WR8750N, WR8160N, WR9500N, WR8600N, WR8370N, WR8170N, WR8700N, WR8300N, WR8150N, WR4100N, WR4500N, WR8100N, WR8500N, CR2500P, WR8400N, WR8200N, WR1200H, WR7870S, WR6670S, WR7850S, WR6650S, WR6600H, WR7800H, WM3400RN, WM3450RN, WM3500R, WM3600R, WM3800R, WR8166N, MR01LN MR02LN, WG1810HP(JE) and WG1810HP(MF) all versions allows a attacker to execute an arbitrary command via the internet.\nReferences: https://jpn.nec.com/security-info/secinfo/nv24-001_en.html",
+                    "metadata": {
+                        "cve_id": "CVE-2024-28014",
+                        "source_file": "files/cves\\2024\\28xxx\\CVE-2024-28014.json"
+                    }
                 }
-            }
-        ]
-    }
-]
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Create a Java servlet that accepts user input (for example, through an HTTP request) and uses it in a function like `String[] args = new String[userInput.length()+1]; System.arraycopy(userInput.toCharArray(), 0, args, 0, userInput.length()); Runtime.getRuntime().exec(args);`\",\n      \"fixed_version\": \"Modify the vulnerable code to validate and sanitize the input, for example by using `String[] args = {\"command\"}.append(validatedUserInput).toArray(new String[0]); Runtime.getRuntime().exec(args);\".replace(\"validatedUserInput\", \"A safe user input\"),\n      \"docker_file\": \"FROM openjdk:8\\nWORKDIR /app\\nCOPY src /app/src\\nRUN javac -cp . /app/src/*.java\\nEXPOSE 8080\\nCMD java -cp . /app/src/YourClass\"\n    }"
+        },
+        {
+            "title": "The Risks of Hardcoded Secrets in Code",
+            "related_slides": [
+                "First Compilation",
+                "Project One"
+            ],
+            "discussion": "Discuss why hardcoding passwords, API keys, or credentials in code is dangerous and how attackers can extract secrets from repositories.",
+            "lab_opportunity": "Provide an insecure Java program with a hardcoded API key and have students implement secure storage using environment variables or configuration files.",
+            "cve_match": [
+                {
+                    "page_content": "Description: Hardcoded credentials are discovered within the application's source code, creating a potential security risk for unauthorized access.\nReferences: https://advisories.ncsc.nl/advisory?id=NCSC-2024-0273",
+                    "metadata": {
+                        "cve_id": "CVE-2023-41919",
+                        "source_file": "files/cves\\2023\\41xxx\\CVE-2023-41919.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Here is a simple Java program demonstrating hardcoded API key: \\n\\n```java\\npublic class VulnerableExample {\\n  public static void main(String[] args) {\\n    String apiKey = \\\"hardcodedAPIKey\\\";\\n    // Use the API key in your requests.\\n  }\\n}\\n\",\n      \"fixed_version\": \"A fixed version of the code could look like this, using environment variables or configuration files: \\n\\n```java\\npublic class FixedExample {\\n  public static void main(String[] args) {\\n    String apiKey = System.getenv(\\\"API\\_KEY\\\"); // Load the API key from environment variable.\\n    // Use the API key in your requests.\\n  }\\n}\\n\",\n      \"docker_file\": \"To set up and run the lab, you can use the following Dockerfile:\\n\\nFROM openjdk:8\\nCOPY VulnerableExample.java /app/\\nEXPOSE 8080\\nRUN javac -cp /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar /app/VulnerableExample.java\\nRUN mkdir config && echo \\\"hardcodedAPIKey\\\" > config/api_key.txt \\nCMD [\\\"java\\\", \\\"-cp\\\", \\\"/\\\", \\\"/app/VulnerableExample\\\" ]\"\n    }"
+        },
+        {
+            "title": "Version Control Security (Git Best Practices)",
+            "related_slides": [
+                "Git Introduced & Used",
+                "A Twist"
+            ],
+            "discussion": "Explain Git security best practices, including avoiding committing secrets, using signed commits, and securing `.git` directories.",
+            "lab_opportunity": "Have students review a repository history, find sensitive information committed by mistake, and remove it using `git rebase` or `git filter-branch`.",
+            "cve_match": [
+                {
+                    "page_content": "Description: Git is a revision control system. Using a specially-crafted repository, Git prior to versions 2.39.2, 2.38.4, 2.37.6, 2.36.5, 2.35.7, 2.34.7, 2.33.7, 2.32.6, 2.31.7, and 2.30.8 can be tricked into using its local clone optimization even when using a non-local transport. Though Git will abort local clones whose source `$GIT_DIR/objects` directory contains symbolic links, the `objects` directory itself may still be a symbolic link. These two may be combined to include arbitrary files based on known paths on the victim's filesystem within the malicious repository's working copy, allowing for data exfiltration in a similar manner as CVE-2022-39253.",
+                    "metadata": {
+                        "cve_id": "CVE-2023-22490",
+                        "source_file": "files/cves\\2023\\22xxx\\CVE-2023-22490.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Here is a vulnerable Git repository demonstrating the issue:\n\n```bash\n$ git init VulnerableRepository\n$ cd VulnerableRepository\n$ echo 'This is a sensitive data' > secret.txt\n$ git add .\n$ git commit -m 'Initial commit'\n$ mkdir secrets\n$ echo 'Another sensitive data' > secrets/anothersensitive.txt\n$ git add .\n$ git commit -m 'Adding another secret file'\n$ cp secrets/anothersensitive.txt ../maliciousRepository/.git/objects/\n\",\n      \"fixed_version\": \"To fix the issue, make sure to avoid committing sensitive data directly to the repository and properly manage your Git `.git` directories:\n\n```bash\n$ git init VulnerableRepository\n$ cd VulnerableRepository\n$ echo 'This is a sensitive data' > secret.txt\n$ mkdir secrets\n$ echo 'Another sensitive data' > secrets/anothersensitive.txt\n$ git config core.excludesfile '.gitignore'\n$ echo 'secret.txt' >> .gitignore\n$ echo 'secrets/' >> .gitignore\n$ git add .gitignore\n$ git commit -m 'Adding .gitignore to ignore sensitive files'\n\",\n      \"docker_file\": \"To set up and run the lab, you can use the following Dockerfile:\n\n```Dockerfile\nFROM ubuntu:latest\nRUN apt-get update && apt-get install -y git\nWORKDIR /app\nCOPY vulnerable.git /app/vulnerableRepository\nCOPY fixed.git /app/fixedRepository\nCMD [\"git\", \"clone\", \"/app/vulnerableRepository\"]\"\n    }"
+        },
+        {
+            "title": "The Role of the Java Security Manager",
+            "related_slides": [
+                "Learning Java"
+            ],
+            "discussion": "Discuss the deprecation of Java's Security Manager and its security implications, along with alternative security mechanisms in modern Java.",
+            "lab_opportunity": "Have students explore Java sandboxing techniques and enforce security policies on file access.",
+            "cve_match": [
+                {
+                    "page_content": "Description: Vulnerability in the Oracle Java SE, Oracle GraalVM for JDK, Oracle GraalVM Enterprise Edition product of Oracle Java SE (component: JSSE).  Supported versions that are affected are Oracle Java SE: 8u381, 8u381-perf, 11.0.20, 17.0.8, 21; Oracle GraalVM for JDK: 17.0.8, 21; Oracle GraalVM Enterprise Edition: 20.3.11, 21.3.7 and  22.3.3. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTPS to compromise Oracle Java SE, Oracle GraalVM for JDK, Oracle GraalVM Enterprise Edition.  Successful attacks of this vulnerability can result in unauthorized ability to cause a partial denial of service (partial DOS) of Oracle Java SE, Oracle GraalVM for JDK, Oracle GraalVM Enterprise Edition. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets, that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for",
+                    "metadata": {
+                        "cve_id": "CVE-2023-22081",
+                        "source_file": "files/cves\\2023\\22xxx\\CVE-2023-22081.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"A vulnerable Java code example using Oracle Java SE, Oracle GraalVM for JDK, Oracle GraalVM Enterprise Edition that exploits the CVE-2023-22081 vulnerability.\",\n      \"fixed_version\": \"The same Java code example with the necessary patches applied to fix the vulnerability.\",\n      \"docker_file\": \"A Dockerfile to set up an environment with the vulnerable and fixed versions of the Java code, along with instructions to run a test for exploitation and mitigation\"\n    }"
+        },
+        {
+            "title": "Command Line Security & Linux Hardening",
+            "related_slides": [
+                "Why Linux?"
+            ],
+            "discussion": "Introduce Linux security best practices, including file permissions, sudo abuse, and SSH key-based authentication.",
+            "lab_opportunity": "Have students set proper file permissions on Java projects and configure SSH keys for secure remote access.",
+            "cve_match": [
+                {
+                    "page_content": "the vulnerability. Users unable to upgrade may mitigate the vulnerability by ensuring that their admin accounts are secured with strong passwords and follow other best practices for account security. Additionally, users can limit the exposure of sensitive files on the server by implementing appropriate file permissions and access controls at the operating system level.",
+                    "metadata": {
+                        "cve_id": "CVE-2023-27577",
+                        "source_file": "files/cves\\2023\\27xxx\\CVE-2023-27577.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Not applicable as this CVE does not provide a vulnerable code example, but it affects Linux servers with improper file permissions and access controls.\",\n      \"fixed_version\": \"A secured version of the server setup with proper file permissions, strong passwords for admin accounts, and SSH key-based authentication.\",\n      \"dockerfile\": \"Dockerfile to set up a Linux server with default configurations (without proper security measures), then apply the mitigation steps: \\n\\nFROM ubuntu:latest \\n\\nRUN apt-get update && apt-get install -y openssh-server sudo \\n\\nEXPOSE 22 \\n\\nCMD [\\\"bash\\\", \\\"-\\c\\\", \\\"sudo bash\\\"] \\n\\n-->\\n\\nDOCKER_BUILDKIT=1 docker build -t cve-lab . \\n\\ndocker run -d --name=cve-lab -p 2222:22 cve-lab\"\n    }"
+        },
+        {
+            "title": "Secure Third-Party Library Management (Dependency Security)",
+            "related_slides": [
+                "Library Management Introduced"
+            ],
+            "discussion": "Discuss why relying on outdated libraries is dangerous, how attackers exploit insecure dependencies, and how to check for vulnerable dependencies.",
+            "lab_opportunity": "Have students scan a Java project's dependencies for known vulnerabilities using OWASP Dependency-Check and update outdated packages.",
+            "cve_match": [
+                {
+                    "page_content": "Description: A dynamic search for a prerequisite library could allow the possibility for an attacker to replace the correct file under some circumstances.\nReferences: https://support.hcl-software.com/csm?id=kb_article&sysparm_article=KB0116659",
+                    "metadata": {
+                        "cve_id": "CVE-2024-30117",
+                        "source_file": "files/cves\\2024\\30xxx\\CVE-2024-30117.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"To demonstrate the vulnerability, consider a simple Java project with a Maven build system that relies on a third-party library vulnerable to CVE-2024-30117. For example, in your `pom.xml` file include:\\n```\\n<dependency>\\n  <groupId>vulnerable.library</groupId>\\n  <artifactId>vulnerable-artifact</artifactId>\\n  <version>1.0</version>\\n</dependency>\\n```\\n\",\n      \"fixed_version\": \"To mitigate the vulnerability, update the version of the vulnerable library to a fixed one. For instance, in your `pom.xml` file:\\n```\\n<dependency>\\n  <groupId>vulnerable.library</groupId>\\n  <artifactId>vulnerable-artifact</artifactId>\\n  <version>2.0</version>\\n</dependency>\\n```\\n\",\n      \"dockerfile\": \"To set up and run the lab using Docker, create a Dockerfile with the following content:\\n```Dockerfile\\nFROM openjdk:8-jre-alpine\\nWORKDIR /app\\nCOPY pom.xml .\\nRUN mvn dependency:get\\nRUN mvn clean compile\\nCMD [\\\"java\\\", \\\"MainClassName\\\"]\\n```\\nReplace `MainClassName` with the name of your project's main class.\"\n    }"
+        },
+        {
+            "title": "Secure Object-Oriented Programming (OOP) Concepts",
+            "related_slides": [
+                "Learning Java"
+            ],
+            "discussion": "Explain how OOP principles like encapsulation, inheritance, and polymorphism impact security, such as data leaks through public fields or method overriding risks.",
+            "lab_opportunity": "Provide an insecure Java class design and have students refactor it to follow secure encapsulation best practices.",
+            "cve_match": [
+                {
+                    "page_content": "Description: \nSome Honor products are affected by type confusion vulnerability, successful exploitation could cause information leak.\n\n\nReferences: https://www.hihonor.com/global/security/cve-2023-23442/",
+                    "metadata": {
+                        "cve_id": "CVE-2023-23442",
+                        "source_file": "files/cves\\2023\\23xxx\\CVE-2023-23442.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"```java\\npublic class InsecureHonorClass { \\n    private String sensitiveData; // Data that should be private but is accessible due to the issue\\n    public void setSensitiveData(String data) {\\n        this.sensitiveData = data;\\n    }\\n    public String getSensitiveData() {\\n        return this.sensitiveData;\\n    }\\n}\\n\",\n      \"fixed_version\": \"```java\\npublic class SecureHonorClass { \\n    private String sensitiveData; // Data that should be private and inaccessible\\n    public void setSensitiveData(String data) {\\n        this.sensitiveData = data;\\n    }\\n    public String getEncryptedSensitiveData() {\\n        // Implement encryption for the data before returning it\\n        return encrypt(this.sensitiveData);\\n    }\\n}\\n\",\n      \"docker_file\": \"\\nFROM openjdk:8\\nCOPY InsecureHonorClass.java /app/\\nCOPY SecureHonorClass.java /app/\\nRUN javac -cp . /app/InsecureHonorClass.java && javac -cp . /app/SecureHonorClass.java\\nEXPOSE 8080\\nCMD java InsecureHonorClass\"\n    }"
+        },
+        {
+            "title": "The Dangers of Over-Reliance on AI Tools (LLMs & Code Security)",
+            "related_slides": [
+                "A Double Twist"
+            ],
+            "discussion": "Discuss risks of AI-generated code, including how it can introduce security vulnerabilities like SQL injection or hardcoded secrets.",
+            "lab_opportunity": "Have students analyze AI-generated Java code for security flaws and rewrite it securely.",
+            "cve_match": [
+                {
+                    "page_content": "Description: SQL Injection vulnerability in code-projects Agro-School Management System 1.0 allows attackers to run arbitrary code via the Login page.\nReferences: https://github.com/ASR511-OO7/CVE-2024-25250./blob/main/CVE-38",
+                    "metadata": {
+                        "cve_id": "CVE-2024-25250",
+                        "source_file": "files/cves\\2024\\25xxx\\CVE-2024-25250.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n     \"vulnerable_code\": \"Here is an example of vulnerable Java code that demonstrates SQL Injection: \\n```\\nString query = \\\"SELECT * FROM users WHERE username='\\\" + user + \\\"'\\\";\\nConnection conn = DriverManager.getConnection(DB_URL, user, password);\\nPreparedStatement pstmt = conn.prepareStatement(query);\\npstmt.setString(1, user);\\nResultSet rs = pstmt.executeQuery();\\nwhile (rs.next()) {...}\\n```\",\n     \"fixed_version\": \"Here is a fixed version of the code that mitigates SQL Injection: \\n```\\nPreparedStatement pstmt = conn.prepareStatement(\\\"SELECT * FROM users WHERE username=?\\\");\\npstmt.setString(1, user);\\nResultSet rs = pstmt.executeQuery();\\nwhile (rs.next()) {...}\\n```\",\n     \"docker_file\": \"To set up and run the lab, you can use the following Dockerfile:\\n\\nFROM openjdk:8\\nCOPY Agro-School Management System 1.0 /opt/\\nEXPOSE 8080\\nCMD [\\\"java\\\", \\\"-jar\\\", \\\"/opt/Agro-SchoolManagementSystem.jar\\\"]\"\n    }"
+        },
+        {
+            "title": "Java Deserialization Attacks",
+            "related_slides": [
+                "Learning Java",
+                "First Compilation"
+            ],
+            "discussion": "Explain how insecure deserialization can lead to remote code execution (RCE) in Java applications and discuss real-world vulnerabilities.",
+            "lab_opportunity": "Provide an insecure Java application that deserializes user input, have students exploit it, then fix it using secure serialization techniques.",
+            "cve_match": [
+                {
+                    "page_content": "Description: A deserialization of untrusted data vulnerability with a malicious payload can allow an unauthenticated remote code execution (RCE).\nReferences: https://www.veeam.com/kb4649",
+                    "metadata": {
+                        "cve_id": "CVE-2024-40711",
+                        "source_file": "files/cves\\2024\\40xxx\\CVE-2024-40711.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Here is an example of insecure Java deserialization code:\\n\\n```java\\nimport java.io.*;\\nimport java.net.ServerSocket;\\nimport java.net.Socket;\\n\\npublic class DeserializationExample {\\n\\tprivate static final ObjectInputStream ois = new ObjectInputStream(System.in);\\n\\n    public static void main(String[] args) throws IOException, ClassNotFoundException {\\n        try {\\n            Object obj = ois.readObject();\\n            System.out.println(\\\"Received object: \\\" + obj.getClass().getName());\\n        }\\n        catch (Exception e) {\\n            e.printStackTrace();\\n        }\\n    }\\n}\\n\",\n      \"fixed_version\": \"A fixed version of the code would use secure deserialization techniques such as ObjectInputStream.readObject method with a custom ObjectStreamClass that validates input:\\n\\n```java\\nimport java.io.*;\\nimport java.net.ServerSocket;\\nimport java.net.Socket;\\nimport java.beans.XMLEncoder;\\nimport java.beans.XMLDecoder;\\n\\npublic class SecureDeserializationExample {\\n\\tprivate static final ObjectInputStream ois = new ObjectInputStream(System.in);\\n\\n    public static void main(String[] args) throws IOException, ClassNotFoundException {\\n        try {\\n            XMLDecoder decoder = new XMLDecoder(System.in);\\n            Object obj = decoder.readObject();\\n            XMLEncoder encoder = new XMLEncoder(System.out);\\n            encoder.writeObject(obj);\\n            System.out.println(\\\"Received object: \\\" + obj.getClass().getName());\\n        }\\n        catch (Exception e) {\\n            e.printStackTrace();\\n        }\\n    }\\n}\\n\",\n      \"docker_file\": \"To set up the lab, create a Dockerfile that includes both vulnerable and fixed code, along with required libraries:\\n\\nFROM openjdk:8\\nCOPY DeserializationExample.java SecureDeserializationExample.java /app/\\nRUN javac -classpath ./ /app/*.java\\nEXPOSE 8080\\nCMD [\\\"java\\\", \\\"-cp\\\", \\\".\\\", \\\"DeserializationExample\\\"]\"\n    }"
+        },
+        {
+            "title": "Secure Software Development Lifecycle (SDLC) Awareness",
+            "related_slides": [
+                "Skills Gap",
+                "Proving Your Skillset"
+            ],
+            "discussion": "Introduce the importance of integrating security throughout software development, including threat modeling, secure coding, and security testing.",
+            "lab_opportunity": "Have students perform a basic threat model on their Java project, identifying potential risks and mitigations.",
+            "cve_match": [
+                {
+                    "page_content": "Description: A high-severity vulnerability that can lead to arbitrary code execution on the system hosting the Web SDK role was found in the Genetec Security Center product line.\nReferences: https://resources.genetec.com/security-advisories/high-severity-vulnerability-affecting-security-center-web-sdk-role, https://ressources.genetec.com/bulletins-de-securite/vulnerabilite-de-haute-severite-affectant-le-role-sdk-web-de-security-center",
+                    "metadata": {
+                        "cve_id": "CVE-2024-7059",
+                        "source_file": "files/cves\\2024\\7xxx\\CVE-2024-7059.json"
+                    }
+                }
+            ],
+            "lab_experience": " {\n      \"vulnerable_code\": \"Unfortunately, without specific details about the affected Java project or its structure, it is impossible to provide a vulnerable code example demonstrating the issue in the given CVE (CVE-2024-7059).\",\n      \"fixed_version\": \"Similarly, I cannot provide a fixed version of the code since I do not have access to the original vulnerable code and the specific fix would depend on the Genetec Security Center product line.\",\n      \"docker_file\": \"To set up a lab environment for this CVE, you can use Docker containers. However, since I don't have details about the affected Java project or its dependencies, it is not possible to provide a pre-configured Dockerfile.\"\n    }"
+        }
+    ]

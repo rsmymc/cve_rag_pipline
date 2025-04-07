@@ -1,0 +1,34 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenvs
+.venv/
+env/
+venv/
+
+# Logs
+*.log
+nohup.out
+
+# Environment & config
+.env
+.env.*
+
+# IDE & OS junk
+.vscode/
+.idea/
+.DS_Store
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints/
+
+# Don't copy Docker infra
+Dockerfile
+docker-compose.yml
+
+# (Optional) Ignore CVEs only if mounted from outside
+cves/

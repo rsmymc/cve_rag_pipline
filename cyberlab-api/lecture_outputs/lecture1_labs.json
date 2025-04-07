@@ -1,0 +1,20 @@
+[
+    {
+        "title": "Secure Coding Practices in Java",
+        "related_slides": [
+            "Learning Java",
+            "First Compilation"
+        ],
+        "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
+        "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code.",
+        "cve_match": [
+            {
+                "page_content": "Description: Out-of-bounds Read vulnerability (CWE-125) was found in CX-Programmer. Attackers may be able to read sensitive information or cause an application crash by abusing this vulnerability.\nReferences: https://www.fa.omron.co.jp/product/security/assets/pdf/en/OMSR-2025-003_en.pdf, https://www.fa.omron.co.jp/product/security/assets/pdf/ja/OMSR-2025-003_ja.pdf",
+                "metadata": {
+                    "cve_id": "CVE-2025-0591",
+                    "source_file": "/app/cves/2025/0xxx/CVE-2025-0591.json"
+                }
+            }
+        ]
+    }
+]

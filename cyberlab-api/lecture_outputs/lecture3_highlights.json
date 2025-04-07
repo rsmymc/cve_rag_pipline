@@ -1,0 +1,62 @@
+[
+    {
+      "title": "The Security Implications of Virtualization & Containers",
+      "related_slides": ["Overview"],
+      "discussion": "Discuss how virtualization and containers can improve security through isolation, but also introduce risks such as container escapes, insecure configurations, and privilege escalation.",
+      "lab_opportunity": "Have students set up a Java development environment inside a Docker container, explore container security best practices, and analyze potential security misconfigurations."
+    },
+    {
+      "title": "OS-Level Security & Least Privilege",
+      "related_slides": ["Tech Tuesday: Operating Systems", "Operating Systems"],
+      "discussion": "Introduce the concept of least privilege in operating systems and how improper permission settings can lead to unauthorized access.",
+      "lab_opportunity": "Have students examine file and process permissions in Linux, modifying user privileges and using tools like `chmod` and `sudo` to understand access control."
+    },
+    {
+      "title": "Linux Security & Secure Configurations",
+      "related_slides": ["Unix", "Linux"],
+      "discussion": "Discuss how Linux's open-source nature impacts security, including benefits (community-driven patches) and risks (misconfigurations, root access).",
+      "lab_opportunity": "Have students audit Linux security configurations, checking system logs, setting up firewalls (`ufw` or `iptables`), and modifying SSH settings for secure access."
+    },
+    {
+      "title": "Command Line Security & Secure Scripting",
+      "related_slides": ["Why Learn Linux and the Command Line", "Shell", "Scripts"],
+      "discussion": "Introduce the risks of running unverified scripts, command injection vulnerabilities, and the importance of verifying script sources.",
+      "lab_opportunity": "Have students analyze a shell script containing security flaws (e.g., unchecked user input leading to command injection) and fix it using secure scripting practices."
+    },
+    {
+      "title": "File System Security & Permission Management",
+      "related_slides": ["Root Tree Structure", "Directory Commands"],
+      "discussion": "Explain how improper file permissions can lead to privilege escalation, unauthorized access, and data exposure.",
+      "lab_opportunity": "Have students modify file and directory permissions, use `ls -l` to analyze permissions, and demonstrate how weak permissions can expose sensitive data."
+    },
+    {
+      "title": "The Risks of Improper Command Execution & Shell Escapes",
+      "related_slides": ["Shell Commands", "Command-Line Arguments"],
+      "discussion": "Discuss how misusing shell commands and improper handling of command-line arguments can lead to security vulnerabilities such as shell injection.",
+      "lab_opportunity": "Have students write a Java program that accepts shell commands as input, demonstrate how input validation can prevent command injection, and secure the execution process."
+    },
+    {
+      "title": "Secure File Handling in Java",
+      "related_slides": ["File Commands"],
+      "discussion": "Discuss the risks of insecure file operations, including race conditions, path traversal vulnerabilities, and improper access controls.",
+      "lab_opportunity": "Provide students with an insecure Java file-handling program and have them fix vulnerabilities by implementing proper file validation and access controls."
+    },
+    {
+      "title": "Man-in-the-Middle Attacks & Java Networking",
+      "related_slides": ["Where Do I Find The Java Installation?"],
+      "discussion": "Explain how attackers can intercept network communication in Java applications if SSL/TLS is not correctly implemented.",
+      "lab_opportunity": "Have students create a Java client-server application, then modify it to implement secure TLS connections and validate certificates properly."
+    },
+    {
+      "title": "The Importance of Secure Software Compilation",
+      "related_slides": ["What is Java?"],
+      "discussion": "Discuss how improperly secured compilation processes can lead to supply chain attacks, such as injecting malicious dependencies.",
+      "lab_opportunity": "Have students verify Java build processes, scan dependencies using security tools like `OWASP Dependency-Check`, and demonstrate how outdated libraries pose security risks."
+    },
+    {
+      "title": "Logging & Secure Debugging Practices",
+      "related_slides": ["Scripts"],
+      "discussion": "Explain how improper logging can lead to security issues, including leaking sensitive information and log injection attacks.",
+      "lab_opportunity": "Provide students with a Java logging implementation that improperly logs sensitive data and have them refactor it to use secure logging best practices."
+    }
+  ]

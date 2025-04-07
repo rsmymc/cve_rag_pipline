@@ -19,7 +19,7 @@ To bridge the gap between theory and practice in cybersecurity education, we are
 ### 1️⃣ Clone the project
 
 ```bash
-git clone [https://github.com/your-username/rag-pipeline.git](https://github.com/rsmymc/cve_rag_pipline.git)
+git clone https://github.com/rsmymc/cve_rag_pipline.git
 cd cve_rag-pipeline
 ```
 

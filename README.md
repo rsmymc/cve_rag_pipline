@@ -115,16 +115,8 @@ curl -X POST http://localhost:5000/generate-lab   -H "Content-Type: application/
 
 Basic endpoint to test connection to the Ollama server.
 
-#### 🔸 Request Body
-
-```json
-{ "text": "What is SQL injection?" }
-```
-
-#### 🔸 curl
-
 ```bash
-curl -X POST http://localhost:5000/test-ollama   -H "Content-Type: application/json"   -d '{"text": "What is SQL injection?"}'
+curl -X GET http://localhost:5000/test-ollama
 ```
 
 ---
@@ -197,8 +189,3 @@ make down            # Stop everything
 ```
 
 ---
-
-## 👨‍💼 Author
-
-**CyberLab Team** – 2025  
-Questions? Open an issue or ping the team.

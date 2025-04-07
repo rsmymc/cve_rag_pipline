@@ -121,6 +121,24 @@ curl -X GET http://localhost:5000/test-ollama
 
 ---
 
+### 🔹 `POST /test-chroma`
+
+Test ChromaDB vector similarity search for a given input.
+
+#### 🔸 Request Body
+
+```json
+{ "text": "network vulnerability in Linux kernel" }
+```
+
+#### 🔸 curl
+
+```bash
+curl -X POST http://localhost:5000/test-chroma   -H "Content-Type: application/json"   -d '{"text": "network vulnerability in Linux kernel"}'
+```
+
+---
+
 ## 📊 System Architecture
 
 The following diagram shows the full pipeline for transforming lecture content into hands-on cybersecurity labs using Ollama and ChromaDB:

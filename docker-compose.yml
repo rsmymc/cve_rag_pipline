@@ -46,6 +46,7 @@ services:
       - chromadb
     volumes:
       - ./cyberlab-api:/app
+      - ~/.aws:/root/.aws:ro
     command: ["python", "server.py"]
     env_file:
       - .env

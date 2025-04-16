@@ -93,17 +93,28 @@ collection = client.get_collection( name=COLLECTION_NAME)
 
 # === ChromaDB query using highlight text ===
 def query_chromadb(highlight_text):
-    results = collection.query(
-        query_texts=[highlight_text],
-        n_results=1,
-        include=["metadatas", "documents"]
-    )
-    if results and results["documents"]:
-        return [{
+    logger.info(f"🔍 Querying ChromaDB for highlight: '{highlight_text[:60]}...'")
+
+    try:
+        results = collection.query(
+            query_texts=[highlight_text],
+            n_results=1,
+            include=["metadatas", "documents"]
+        )
+    except Exception as e:
+        logger.error(f"❌ ChromaDB query failed: {e}")
+        return None
+
+    if results and results.get("documents") and results["documents"][0]:
+        match = {
             "page_content": results["documents"][0][0],
             "metadata": results["metadatas"][0][0]
-        }]
-    return None
+        }
+        logger.info(f"✅ Found match: {match['metadata'].get('cve_id', 'N/A')}")
+        return [match]
+    else:
+        logger.warning("⚠️ No results returned from ChromaDB")
+        return None
 
 # === Ask Ollama to generate a lab setup for a CVE-highlight combo ===
 def generate_lab_experience(cve_data, cybersecurity_topic):

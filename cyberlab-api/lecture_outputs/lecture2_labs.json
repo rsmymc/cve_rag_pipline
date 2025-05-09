@@ -1,0 +1,49 @@
+[
+    {
+        "lecture_id" : "l2",
+        "highlight_id" : "h1",
+        "title": "Secure Coding Practices in Java",
+        "related_slides": [
+            "Learning Java",
+            "First Compilation"
+        ],
+        "discussion": "Introduce secure coding practices to prevent common vulnerabilities like buffer overflows, integer overflows, and improper input validation.",
+        "lab_opportunity": "Create a Java program that demonstrates the risks of unvalidated user input, then apply input validation and exception handling to secure the code.",
+        "cve_match": [
+                {
+                    "page_content": "Description: Stack-based Buffer Overflow vulnerability in NEC Corporation Aterm WG1800HP4, WG1200HS3, WG1900HP2, WG1200HP3, WG1800HP3, WG1200HS2, WG1900HP, WG1200HP2, W1200EX(-MS), WG1200HS, WG1200HP, WF300HP2, W300P, WF800HP, WR8165N, WG2200HP, WF1200HP2, WG1800HP2, WF1200HP, WG600HP, WG300HP, WF300HP, WG1800HP, WG1400HP, WR8175N, WR9300N, WR8750N, WR8160N, WR9500N, WR8600N, WR8370N, WR8170N, WR8700N, WR8300N, WR8150N, WR4100N, WR4500N, WR8100N, WR8500N, CR2500P, WR8400N, WR8200N, WR1200H, WR7870S, WR6670S, WR7850S, WR6650S, WR6600H, WR7800H, WM3400RN, WM3450RN, WM3500R, WM3600R, WM3800R, WR8166N, MR01LN MR02LN, WG1810HP(JE) and WG1810HP(MF) all versions allows a attacker to execute an arbitrary command via the internet.\nReferences: https://jpn.nec.com/security-info/secinfo/nv24-001_en.html",
+                    "metadata": {
+                        "cve_id": "CVE-2024-28014",
+                        "source_file": "files/cves\\2024\\28xxx\\CVE-2024-28014.json"
+                    }
+                }
+            ],
+        "lab_experience":  {
+            "vulnerable_code": "```java\\npublic class VulnerableCode {\\n public static void main(String[] args) {\\n String input = args[0]; \\n byte[] payload = new byte[1000]; // Adjust size according to buffer size\\n System.arraycopy(\\\"attacker command\\\", 0, payload, 0, \\\"attacker command\\\" .length()); \\n StringBuilder sb = new StringBuilder(); \\n for (int i = 0; i < payload.length; i++) {\\n sb.append((char) payload[i]);\\n }\\n System.out.println(sb.toString());\\n }\\n}\\n```",
+            "fixed_version": "```java\\npublic class FixedCode {\\n public static void main(String[] args) {\\n String input = args[0]; \\n if (input.contains(\\\"attacker command\\\")) {\\n throw new IllegalArgumentException(\\\"Invalid input\\\");\\n }\\n System.out.println(input);\\n }\\n}\\n```",
+            "docker_file": "FROM openjdk:8\\nWORKDIR /app\\nCOPY VulnerableCode.java FixedCode.java /app/\\nRUN javac -cp . VulnerableCode.java FixedCode.java\\nCMD [\\\"java\\\", \\\"VulnerableCode\\\", \\\"attacker command\\\"]"
+            }
+    },
+    {
+        "lecture_id" : "l2",
+        "highlight_id" : "h2",
+        "title": "OS-Level Security & Least Privilege",
+        "related_slides": ["Tech Tuesday: Operating Systems", "Operating Systems"],
+        "discussion": "Introduce the concept of least privilege in operating systems and how improper permission settings can lead to unauthorized access.",
+        "lab_opportunity": "Have students examine file and process permissions in Linux, modifying user privileges and using tools like `chmod` and `sudo` to understand access control.",
+        "cve_match": [
+                {
+                    "page_content": "Description: Hardcoded credentials are discovered within the application's source code, creating a potential security risk for unauthorized access.\nReferences: https://advisories.ncsc.nl/advisory?id=NCSC-2024-0273",
+                    "metadata": {
+                        "cve_id": "CVE-2023-41919",
+                        "source_file": "files/cves\\2023\\41xxx\\CVE-2023-41919.json"
+                    }
+                }
+            ],
+        "lab_experience": {
+            "vulnerable_code": "```java\\npublic class InsecureAPIKeyExample {\\n  public static final String API_KEY = \\\"hardcoded_api_key_here\\\";\\n  \\n  public void useApi() {\\n    // API call using the hardcoded API key\\n  }\\n}\\",
+            "fixed_version": "```java\\npublic class SecureAPIKeyExample {\\n  private String apiKey;\\n  \\n  public void setApiKey(String key) {\\n    this.apiKey = key;\\n  }\\n  \\n  public void useApi() {\\n    // API call using the securely stored apiKey\\n  }\\n}\\",
+            "dockerfile": "FROM openjdk:8\\n\\nARG api_key\\n\\nCOPY InsecureAPIKeyExample.java /app/\\nCOPY SecureAPIKeyExample.java /app/\\n\\nRUN javac -cp . /app/InsecureAPIKeyExample.java && javac -cp . /app/SecureAPIKeyExample.java\\n\\nEXPOSE 8080\\n\\nCMD java -cp . InsecureAPIKeyExample:useApi\\"
+            }
+    }
+]

@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from chromadb.config import Settings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from ollama_client import generate_rag_response
-from storage import put_multiple_highlights
+from storage import *
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
     for i, highlight in enumerate(cleaned_json):
         highlight["lecture_id"] = lecture_id
         highlight["highlight_id"] = f"h{i + 1}"
-
+        put_highlight(highlight)
 
     with open(filepath, "w", encoding="utf-8") as json_file:
         json.dump(cleaned_json, json_file, indent=4, ensure_ascii=False)
@@ -174,7 +174,9 @@ def process_highlights(highlights, lecture_name=None, use_existing_highlights=Fa
         if use_existing_highlights and os.path.exists(filepath):
             logger.info(f"📂 Loading enriched labs from cache: {filepath}")
             with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
+                highlights = json.load(f)
+                put_multiple_highlights(highlights)
+                return highlights
 
     #Otherwise process highlights
 
@@ -197,6 +199,7 @@ def process_highlights(highlights, lecture_name=None, use_existing_highlights=Fa
         else:
             highlight["cve_match"] = None
             highlight["lab_experience"] = "No related CVE found."
+        put_highlight(highlight)
 
         # === Save enriched lecture_outputs if lecture_name is provided ===
     if lecture_name:

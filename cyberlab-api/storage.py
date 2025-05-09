@@ -28,7 +28,7 @@ def download_from_s3(bucket_name, s3_key, local_file_path):
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('CyberlabHighlights')
 
-def put_highlight_record_from_json(data: dict):
+def put_highlight(data: dict):
 
     if "timestamp" not in data:
         data["timestamp"] = datetime.utcnow().isoformat()
@@ -38,7 +38,7 @@ def put_highlight_record_from_json(data: dict):
 
 def put_multiple_highlights(highlights: list):
     for h in highlights:
-        put_highlight_record_from_json(h)
+        put_highlight(h)
 
 def get_highlight(lecture_id: str, highlight_id: str):
     """

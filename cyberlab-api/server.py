@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from generator import generate_highlights, process_highlights
-from storage import upload_lecture_json_to_s3, put_highlight_record_from_json
+from storage import *
 import logging
 # === Logging Config ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -26,12 +26,18 @@ def handle_lecture():
 
         logger.info(f"📥 Received lecture ID {data['lecture_id']}: {data['lecture_name']}")
 
-        highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
-        result = ""
+        lecture_name = data["lecture_name"]
+        s3_key = f"lectures/{lecture_name}.json"
+        bucket = "cve-rag-pipline-bucket"
+
+        upload_lecture_json_to_s3(data, bucket, s3_key)
+
+
+        #highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
         #result = process_highlights(highlights, lecture_name=data["lecture_name"], use_existing_highlights=data.get("use_existing_highlights", False))
         logger.info(f"✅ Processed lecture_outputs and attached CVEs")
-
-        return jsonify(highlights), 200
+        result = "ok"
+        return jsonify(result), 200
 
     except Exception as e:
         logger.exception("🔥 Unexpected error in /generate-lab")
@@ -86,13 +92,34 @@ def store_highlight():
                 logger.warning(f"❌ Missing fields: {missing_keys}")
                 return jsonify({"error": f"Missing required fields: {', '.join(missing_keys)}"}), 400
 
-        put_highlight_record_from_json(data)
+        put_highlight(data)
 
         return jsonify({"message": f"Highlight {data['lecture_id']} stored"}), 200
 
     except Exception as e:
         logger.exception("🔥 Unexpected error in /store-highlight")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/highlight/<lecture_id>/<highlight_id>', methods=['GET'])
+def get_highlight_api(lecture_id, highlight_id):
+    try:
+        item = get_highlight(lecture_id, highlight_id)
+        if not item:
+            return jsonify({"error": "Highlight not found"}), 404
+        return jsonify(item), 200
+    except Exception as e:
+        logger.exception("🔥 Error retrieving specific highlight")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/highlights/<lecture_id>', methods=['GET'])
+def get_highlights_by_lecture(lecture_id):
+    try:
+        items = query_highlights_by_lecture(lecture_id)
+        return jsonify(items), 200
+    except Exception as e:
+        logger.exception("🔥 Error querying highlights by lecture_id")
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/test-ollama", methods=["GET"])
 def test_ollama_route():

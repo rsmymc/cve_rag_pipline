@@ -1,0 +1,34 @@
+{
+  "lecture_id": "lec01",
+  "highlights": [
+    {
+      "highlight_id": "h01",
+      "title": "Secure Coding Practices in Java",
+      "discussion": "Introduce secure coding practices to prevent common vulnerabilities.",
+      "related_slides": ["Learning Java", "First Compilation"],
+      "lab_opportunity": "Demonstrate input validation using Java.",
+      "cve_match": [
+        {
+          "page_content": "Stack-based Buffer Overflow in NEC...",
+          "metadata": {
+            "cve_id": "CVE-2024-28014",
+            "source_file": "files/cves/2024/28xxx/CVE-2024-28014.json"
+          }
+        }
+      ],
+      "lab_experience": {
+        "vulnerable_code": "public class Vulnerable { ... }",
+        "fixed_version": "public class Fixed { ... }",
+        "docker_file": "FROM openjdk:8\nRUN javac Vulnerable.java"
+      }
+    },
+    {
+      "highlight_id": "h02",
+      "title": "Hardcoded Secrets in Code",
+      "discussion": "Discuss the dangers of hardcoding API keys.",
+      "related_slides": ["First Compilation", "Project One"],
+      "lab_opportunity": "Have students remove hardcoded secrets from a sample app."
+    }
+  ]
+}
+

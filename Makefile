@@ -25,6 +25,10 @@ restart-ollama:
 	docker compose rm -sf ollama
 	docker compose up ollama
 
+restart-api:
+	docker compose rm -sf cyberlab-api
+	docker compose up cyberlab-api
+
 # === Cleanup ===
 clean:
 	docker-compose down -v

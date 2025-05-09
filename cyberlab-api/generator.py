@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 from chromadb.config import Settings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from ollama_client import generate_rag_response
+from storage import put_multiple_highlights
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ OUTPUT_FOLDER = "lecture_outputs"
 def generate_highlights(lecture_data, use_existing_highlights=False):
     content = lecture_data["lecture_content"]
     lecture_name = lecture_data["lecture_name"]
+    lecture_id = lecture_data["lecture_id"]
 
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     filename = f"{lecture_name.replace(' ', '_')}_highlights.json"
@@ -23,7 +25,9 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
     if use_existing_highlights and os.path.exists(filepath):
         logger.info(f"📂 Using cached highlights from: {filepath}")
         with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+            highlights = json.load(f)
+            put_multiple_highlights(highlights)
+            return highlights
 
     question = """
       Based on the provided lecture content, generate 1 key lecture_outputs in the following JSON format:
@@ -53,6 +57,11 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
         logger.error("❌ Failed to parse lecture_outputs from Ollama response")
         raise ValueError(f"Invalid JSON response from Ollama: {e}")
 
+    for i, highlight in enumerate(cleaned_json):
+        highlight["lecture_id"] = lecture_id
+        highlight["highlight_id"] = f"h{i + 1}"
+
+
     with open(filepath, "w", encoding="utf-8") as json_file:
         json.dump(cleaned_json, json_file, indent=4, ensure_ascii=False)
         logger.info(f"📝 Highlights saved to {filename}")
@@ -60,9 +69,9 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
     return cleaned_json
 
 # === Load environment variables ===
-CHROMA_URL = os.getenv("CHROMA_URL")
-COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME")
-MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME")
+CHROMA_URL = os.getenv("CHROMA_URL", "http://localhost:8000")
+COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME", "cves_minilm")
+MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME", "all-MiniLM-L6-v2")
 
 logger.info(f"🔗 ChromaDB URL: {CHROMA_URL}")
 logger.info(f"🧠 Embedding model: {MODEL_NAME}")
@@ -117,17 +126,17 @@ def query_chromadb(highlight_text):
         return None
 
 # === Ask Ollama to generate a lab setup for a CVE-highlight combo ===
-def generate_lab_experience(cve_data, cybersecurity_topic):
+def generate_lab_experience(cve_data, highlight):
     content = f"""
     Here is a cybersecurity highlight I would like to introduce in my class.
 
-    Title: {cybersecurity_topic["title"]}
+    Title: {highlight["title"]}
 
-    Related Slides: {cybersecurity_topic["related_slides"]}
+    Related Slides: {highlight["related_slides"]}
 
-    Discussion: {cybersecurity_topic["discussion"]}
+    Discussion: {highlight["discussion"]}
 
-    Lab Opportunity: {cybersecurity_topic["lab_opportunity"]}
+    Lab Opportunity: {highlight["lab_opportunity"]}
 
     Related CVE: {cve_data[0]["metadata"]["cve_id"]}
     Description: {cve_data[0]["page_content"]}

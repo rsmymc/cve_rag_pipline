@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-#from generator import generate_highlights, process_highlights
+from generator import generate_highlights, process_highlights
 from storage import upload_lecture_json_to_s3, put_highlight_record_from_json
 import logging
 # === Logging Config ===
@@ -26,12 +26,12 @@ def handle_lecture():
 
         logger.info(f"📥 Received lecture ID {data['lecture_id']}: {data['lecture_name']}")
 
-        #highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
+        highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
         result = ""
         #result = process_highlights(highlights, lecture_name=data["lecture_name"], use_existing_highlights=data.get("use_existing_highlights", False))
         logger.info(f"✅ Processed lecture_outputs and attached CVEs")
 
-        return jsonify(result), 200
+        return jsonify(highlights), 200
 
     except Exception as e:
         logger.exception("🔥 Unexpected error in /generate-lab")

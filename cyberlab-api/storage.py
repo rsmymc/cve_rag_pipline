@@ -35,3 +35,23 @@ def put_highlight_record_from_json(data: dict):
 
     table.put_item(Item=data)
     print(f"[DynamoDB] Stored highlight in lecture {data['lecture_id']}")
+
+def put_multiple_highlights(highlights: list):
+    for h in highlights:
+        put_highlight_record_from_json(h)
+
+def get_highlight(lecture_id: str, highlight_id: str):
+    """
+    Retrieve a specific highlight by lecture_id and highlight_id.
+    """
+    response = table.get_item(Key={"lecture_id": lecture_id, "highlight_id": highlight_id})
+    return response.get("Item")
+
+def query_highlights_by_lecture(lecture_id: str):
+    """
+    Retrieve all highlights for a specific lecture_id.
+    """
+    response = table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('lecture_id').eq(lecture_id)
+    )
+    return response.get("Items", [])

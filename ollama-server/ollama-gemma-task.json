@@ -1,0 +1,29 @@
+{
+  "family": "ollama-gemma-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::959632173666:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "ollama",
+      "image": "public.ecr.aws/x6i8o2b8/ollama-gemma:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 11434,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ollama-gemma",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

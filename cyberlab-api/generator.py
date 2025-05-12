@@ -69,7 +69,7 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
     return cleaned_json
 
 # === Load environment variables ===
-CHROMA_URL = os.getenv("CHROMA_URL", "http://localhost:8000")
+CHROMA_URL = os.getenv("CHROMA_URL", "http://18.222.121.173:8000")
 COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME", "cves_minilm")
 MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME", "all-MiniLM-L6-v2")
 

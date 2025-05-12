@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from chromadb.config import Settings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from document_loader import read_all_json_documents
+from document_loader import read_all_s3_documents
 from embedding_wrapper import ChromaCompatibleEmbeddingFunction
 
 # === Logging Configuration ===
@@ -15,9 +15,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 # === Environment Configuration ===
-CHROMA_URL = os.getenv("CHROMA_URL")
-COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME")
-MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME")
+CHROMA_URL = os.getenv("CHROMA_URL", "http://18.224.70.220:8000")
+COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME", "cves_minilm")
+MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME", "all-MiniLM-L6-v2")
 CVES_FOLDER_PATH = os.getenv("CVES_FOLDER_PATH")
 
 logger.info(f"🔗 ChromaDB URL: {CHROMA_URL}")
@@ -72,7 +72,7 @@ def build_chroma_index():
         embedding_function=embedding_fn
     )
 
-    documents = read_all_json_documents(CVES_FOLDER_PATH)
+    documents = read_all_s3_documents()
     index_documents_into_chroma(collection, documents)
 
 # === Entry point ===

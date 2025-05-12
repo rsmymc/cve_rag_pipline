@@ -1,24 +1,25 @@
-import chromadb
-from urllib.parse import urlparse
-from chromadb.config import Settings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from document_loader import read_all_s3_documents
+import logging
 
-chroma_url = "http://chromadb:8000"  # Use localhost when running outside Docker
-parsed = urlparse(chroma_url)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
 
-client = chromadb.HttpClient(
-    host=parsed.hostname,
-    port=parsed.port,
-    settings=Settings()
+chunk_size=1000
+chunk_overlap=200
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=chunk_size,
+    chunk_overlap=chunk_overlap,
+    length_function=len
 )
 
-# List all collections
-collections = client.list_collections()
-for col in collections:
-    print(f"Collection: {col.name}")
+documents = read_all_s3_documents()
+chunks = text_splitter.split_documents(documents)
 
-    try:
-        count = col.count()
-        print(f" - Item count: {count}")
-        print(f" - Sample: {col.peek()}")
-    except Exception as e:
-        print(f" - Error accessing collection: {e}")
+for doc in chunks:
+    metadatas=[doc.metadata]
+    documents=[doc.page_content]
+    logger.info(f"metadatas: {metadatas} documents :{metadatas}")
+
+
+logger.info(f"📦 Indexing {len(chunks)} chunks...")

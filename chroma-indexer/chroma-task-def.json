@@ -1,0 +1,49 @@
+{
+  "family": "chromadb-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::959632173666:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "chromadb",
+      "image": "ghcr.io/chroma-core/chroma:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "IS_PERSISTENT", "value": "TRUE" },
+        { "name": "PERSIST_DIRECTORY", "value": "/data" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "chroma-efs-vol",
+          "containerPath": "/data"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/chromadb",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "essential": true
+    }
+  ],
+  "volumes": [
+    {
+      "name": "chroma-efs-vol",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0274164cec35300cc",
+        "transitEncryption": "ENABLED",
+        "rootDirectory": "/"
+      }
+    }
+  ]
+}

@@ -4,3 +4,4 @@ requests
 huggingface-hub
 sentence-transformers==2.6.1
 transformers==4.36.2
+boto3

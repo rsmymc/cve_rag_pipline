@@ -1,6 +1,3 @@
-import json
-import os
-import logging
 import chromadb
 import time
 from urllib.parse import urlparse
@@ -9,23 +6,54 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from ollama_client import generate_rag_response
 from storage import *
 
+# === Logging Config ===
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+# === Load environment variables ===
+CHROMA_URL = os.getenv("CHROMA_URL", "http://18.222.121.173:8000")
+COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME", "cves_minilm")
+MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME", "all-MiniLM-L6-v2")
 OUTPUT_FOLDER = "lecture_outputs"
+
+logger.info(f"🔗 ChromaDB URL: {CHROMA_URL}")
+logger.info(f"🧠 Embedding model: {MODEL_NAME}")
+logger.info(f"📚 Collection: {COLLECTION_NAME}")
+
+# === Initialize ChromaDB client and collection ===
+def wait_for_chromadb(host: str, port: int) -> chromadb.HttpClient:
+    while True:
+        try:
+            client = chromadb.HttpClient(
+                host=host,
+                port=port,
+                settings=Settings(allow_reset=False)
+            )
+            client.list_collections()
+            logger.info("✅ Connected to ChromaDB")
+            return client
+        except Exception:
+            logger.warning("⏳ Waiting for ChromaDB...")
+            time.sleep(2)
+
+parsed_url = urlparse(CHROMA_URL)
+client = wait_for_chromadb(parsed_url.hostname, parsed_url.port)
+
+embedding_function_minilm = HuggingFaceEmbeddings(model_name=MODEL_NAME)
+
+collection = client.get_collection( name=COLLECTION_NAME)
 
 def generate_highlights(lecture_data, use_existing_highlights=False):
     content = lecture_data["lecture_content"]
     lecture_name = lecture_data["lecture_name"]
     lecture_id = lecture_data["lecture_id"]
 
-    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     filename = f"{lecture_name.replace(' ', '_')}_highlights.json"
-    filepath = os.path.join(OUTPUT_FOLDER, filename)
 
-    if use_existing_highlights and os.path.exists(filepath):
-        logger.info(f"📂 Using cached highlights from: {filepath}")
-        with open(filepath, "r", encoding="utf-8") as f:
-            highlights = json.load(f)
+    if use_existing_highlights:
+        highlights = load_json_from_s3(filename)
+        if highlights:
+            logger.info(f"📂 Loaded cached highlights from s3://{S3_BUCKET}/{filename}")
             put_multiple_highlights(highlights)
             return highlights
 
@@ -62,43 +90,53 @@ def generate_highlights(lecture_data, use_existing_highlights=False):
         highlight["highlight_id"] = f"h{i + 1}"
         put_highlight(highlight)
 
-    with open(filepath, "w", encoding="utf-8") as json_file:
-        json.dump(cleaned_json, json_file, indent=4, ensure_ascii=False)
-        logger.info(f"📝 Highlights saved to {filename}")
+    upload_lecture_json_to_s3(filename, cleaned_json)
+    logger.info(f"📝 Highlights saved to s3://{S3_BUCKET}/{filename}")
 
     return cleaned_json
 
-# === Load environment variables ===
-CHROMA_URL = os.getenv("CHROMA_URL", "http://18.222.121.173:8000")
-COLLECTION_NAME = os.getenv("CHROMA_DB_MINILM_COLLECTION_NAME", "cves_minilm")
-MODEL_NAME = os.getenv("CHROMA_DB_MINILM_MODEL_NAME", "all-MiniLM-L6-v2")
+# === Main function to enrich lecture_outputs ===
+def process_highlights(highlights, lecture_name=None, use_existing_highlights=False):
+    filename = f"{lecture_name.replace(' ', '_')}_labs.json"
 
-logger.info(f"🔗 ChromaDB URL: {CHROMA_URL}")
-logger.info(f"🧠 Embedding model: {MODEL_NAME}")
-logger.info(f"📚 Collection: {COLLECTION_NAME}")
+    if lecture_name:
+        # If flag is set AND file exists — use it
+        if use_existing_highlights:
+            highlights = load_json_from_s3(filename)
+            if highlights:
+                logger.info(f"📂 Loaded cached highlights from s3://{S3_BUCKET}/{filename}")
+                put_multiple_highlights(highlights)
+                return highlights
 
-# === Initialize ChromaDB client and collection ===
-def wait_for_chromadb(host: str, port: int) -> chromadb.HttpClient:
-    while True:
+    #Otherwise process highlights
+
+    if isinstance(highlights, str):
         try:
-            client = chromadb.HttpClient(
-                host=host,
-                port=port,
-                settings=Settings(allow_reset=False)
-            )
-            client.list_collections()
-            logger.info("✅ Connected to ChromaDB")
-            return client
-        except Exception:
-            logger.warning("⏳ Waiting for ChromaDB...")
-            time.sleep(2)
+            highlights_json = json.loads(highlights.strip().strip('"'))
+        except Exception as e:
+            logger.error(f"❌ Failed to parse lecture_outputs JSON: {e}")
+            raise
+    else:
+        highlights_json = highlights  # already parsed
 
-parsed_url = urlparse(CHROMA_URL)
-client = wait_for_chromadb(parsed_url.hostname, parsed_url.port)
+    for highlight in highlights_json:
+        discussion = highlight.get("discussion", "")
+        cve_match = query_chromadb(discussion)
 
-embedding_function_minilm = HuggingFaceEmbeddings(model_name=MODEL_NAME)
+        if cve_match:
+            highlight["cve_match"] = cve_match
+            highlight["lab_experience"] = generate_lab_experience(cve_match, highlight)
+        else:
+            highlight["cve_match"] = None
+            highlight["lab_experience"] = "No related CVE found."
+        put_highlight(highlight)
 
-collection = client.get_collection( name=COLLECTION_NAME)
+        # === Save enriched lecture_outputs if lecture_name is provided ===
+    if lecture_name:
+        upload_lecture_json_to_s3(filename, highlights_json)
+        logger.info(f"📦 Enriched highlights saved to s3://{S3_BUCKET}/{filename}")
+
+    return highlights_json
 
 # === ChromaDB query using highlight text ===
 def query_chromadb(highlight_text):
@@ -163,49 +201,3 @@ def generate_lab_experience(cve_data, highlight):
     except Exception as e:
         logger.error(f"❌ Failed to parse lab response: {e}")
         return {"error": "Lab generation failed"}
-
-# === Main function to enrich lecture_outputs ===
-def process_highlights(highlights, lecture_name=None, use_existing_highlights=False):
-    if lecture_name:
-        filename = f"{lecture_name.replace(' ', '_')}_labs.json"
-        filepath = os.path.join(OUTPUT_FOLDER, filename)
-
-        # If flag is set AND file exists — use it
-        if use_existing_highlights and os.path.exists(filepath):
-            logger.info(f"📂 Loading enriched labs from cache: {filepath}")
-            with open(filepath, "r", encoding="utf-8") as f:
-                highlights = json.load(f)
-                put_multiple_highlights(highlights)
-                return highlights
-
-    #Otherwise process highlights
-
-    if isinstance(highlights, str):
-        try:
-            highlights_json = json.loads(highlights.strip().strip('"'))
-        except Exception as e:
-            logger.error(f"❌ Failed to parse lecture_outputs JSON: {e}")
-            raise
-    else:
-        highlights_json = highlights  # already parsed
-
-    for highlight in highlights_json:
-        discussion = highlight.get("discussion", "")
-        cve_match = query_chromadb(discussion)
-
-        if cve_match:
-            highlight["cve_match"] = cve_match
-            highlight["lab_experience"] = generate_lab_experience(cve_match, highlight)
-        else:
-            highlight["cve_match"] = None
-            highlight["lab_experience"] = "No related CVE found."
-        put_highlight(highlight)
-
-        # === Save enriched lecture_outputs if lecture_name is provided ===
-    if lecture_name:
-        os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(highlights_json, f, indent=4, ensure_ascii=False)
-            logger.info(f"📦 Enriched lecture_outputs saved to {filepath}")
-
-    return highlights_json

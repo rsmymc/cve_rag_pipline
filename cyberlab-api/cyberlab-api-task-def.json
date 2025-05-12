@@ -1,0 +1,42 @@
+{
+  "family": "cyberlab-api-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::959632173666:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::959632173666:role/ecsTaskRoleWithS3AndDynamo",
+  "containerDefinitions": [
+    {
+      "name": "cyberlab-api",
+      "image": "public.ecr.aws/x6i8o2b8/cyberlab-api:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+	  "essential": true,
+	  "environment": [
+        { "name": "CHROMA_URL", "value": "http://18.191.240.68:8000" },
+        { "name": "CHROMA_DB_MINILM_MODEL_NAME", "value": "all-MiniLM-L6-v2" },
+        { "name": "CHROMA_DB_MINILM_COLLECTION_NAME", "value": "cves_minilm" },
+        { "name": "OLLAMA_HOST", "value": "http://3.137.186.44:11434" },
+        { "name": "OLLAMA_MODEL", "value": "gemma:2b" },
+        { "name": "S3_BUCKET", "value": "cve-rag-pipline-bucket" },
+        { "name": "S3_PREFIX", "value": "lectures/" },
+        { "name": "DYNAMODB_TABLE", "value": "CyberlabHighlights" },
+        { "name": "AWS_REGION", "value": "us-east-2" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cyberlab-api",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from generator import generate_highlights, process_highlights
 from storage import *
 import logging
+
 # === Logging Config ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -27,16 +28,11 @@ def handle_lecture():
         logger.info(f"📥 Received lecture ID {data['lecture_id']}: {data['lecture_name']}")
 
         lecture_name = data["lecture_name"]
-        s3_key = f"lectures/{lecture_name}.json"
-        bucket = "cve-rag-pipline-bucket"
+        upload_lecture_json_to_s3(lecture_name, data)
 
-        upload_lecture_json_to_s3(data, bucket, s3_key)
-
-
-        #highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
-        #result = process_highlights(highlights, lecture_name=data["lecture_name"], use_existing_highlights=data.get("use_existing_highlights", False))
+        highlights = generate_highlights(data, use_existing_highlights=data.get("use_existing_highlights", False))
+        result = process_highlights(highlights, lecture_name=data["lecture_name"], use_existing_highlights=data.get("use_existing_highlights", False))
         logger.info(f"✅ Processed lecture_outputs and attached CVEs")
-        result = "ok"
         return jsonify(result), 200
 
     except Exception as e:
@@ -60,10 +56,7 @@ def upload_lecture():
         logger.info(f"📥 Received lecture ID {data['lecture_id']}: {data['lecture_name']}")
 
         lecture_name = data["lecture_name"]
-        s3_key = f"lectures/{lecture_name}.json"
-        bucket = "cve-rag-pipline-bucket"
-
-        upload_lecture_json_to_s3(data, bucket, s3_key)
+        upload_lecture_json_to_s3(lecture_name, data)
 
         return jsonify({"message": f"Lecture {lecture_name} uploaded to S3"}), 200
     except Exception as e:
@@ -82,7 +75,6 @@ def store_highlight():
         if not data or "lecture_id" not in data or "highlights" not in data:
             return jsonify({"error": "Required keys: lecture_id, highlights"}), 400
 
-        lecture_id = data["lecture_id"]
         highlights = data["highlights"]
 
         for i, item in enumerate(highlights):
@@ -119,7 +111,6 @@ def get_highlights_by_lecture(lecture_id):
     except Exception as e:
         logger.exception("🔥 Error querying highlights by lecture_id")
         return jsonify({"error": str(e)}), 500
-
 
 @app.route("/test-ollama", methods=["GET"])
 def test_ollama_route():

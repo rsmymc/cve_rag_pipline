@@ -2,7 +2,5 @@ flask
 ollama
 chromadb
 langchain==0.1.16
-huggingface-hub
 sentence-transformers==2.6.1
-transformers==4.36.2
 boto3

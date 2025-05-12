@@ -10,8 +10,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the code
 COPY . .
 
-# Set environment defaults (optional)
-ENV S3_PREFIX=cves/
-
 # Run the indexer
 CMD ["python", "indexer.py"]

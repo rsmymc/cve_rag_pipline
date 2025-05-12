@@ -1,7 +1,11 @@
 import os
 import json
 import boto3
+import logging
 from langchain_core.documents import Document
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def process_json_to_document(file_path):
     try:
@@ -59,12 +63,19 @@ def read_all_s3_documents():
     documents = []
     bucket = os.getenv("S3_BUCKET", "cve-rag-pipline-bucket")
     prefix = os.getenv("S3_PREFIX", "cves/2025/")
+    logger.info(f"📦 Reading from S3 bucket: {bucket}, prefix: {prefix}")
+
     s3 = boto3.client("s3")
     paginator = s3.get_paginator("list_objects_v2")
+    total_files = 0
+    total_success = 0
+    total_failed = 0
+
     for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith(".json"):
+                total_files += 1
                 try:
                     response = s3.get_object(Bucket=bucket, Key=key)
                     content = response["Body"].read()
@@ -72,7 +83,13 @@ def read_all_s3_documents():
                     doc = process_s3_json_to_document(data, key)
                     if doc:
                         documents.append(doc)
+                        total_success += 1
+                    else:
+                        logger.warning(f"⚠️ No document returned for: {key}")
                 except Exception as e:
-                    print(f"⚠️ Could not process {key}: {e}")
+                    total_failed += 1
+                    logger.error(f"❌ Failed to process {key}: {e}")
 
+    logger.info(
+        f"✅ S3 read complete: {total_success} documents loaded, {total_failed} failed, out of {total_files} files.")
     return documents

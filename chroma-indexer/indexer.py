@@ -1,6 +1,6 @@
 import os
 import time
-import uuid
+import hashlib
 import logging
 import chromadb
 from urllib.parse import urlparse
@@ -55,8 +55,9 @@ def index_documents_into_chroma(collection, documents, chunk_size=1000, chunk_ov
 
     logger.info(f"📦 Indexing {len(chunks)} chunks...")
     for doc in chunks:
+        content_hash = hashlib.sha256(doc.page_content.encode('utf-8')).hexdigest()
         collection.add(
-            ids=[str(uuid.uuid4())],
+            ids=[content_hash],
             metadatas=[doc.metadata],
             documents=[doc.page_content]
         )

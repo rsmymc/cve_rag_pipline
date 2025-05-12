@@ -1,0 +1,31 @@
+{
+  "family": "chroma-indexer-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "taskRoleArn": "arn:aws:iam::959632173666:role/ecsTaskRoleWithS3Access",
+  "executionRoleArn": "arn:aws:iam::959632173666:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "chroma-indexer",
+      "image": "public.ecr.aws/x6i8o2b8/chroma-indexer",
+      "essential": true,
+      "environment": [
+        { "name": "CHROMA_URL", "value": "http://18.191.240.68:8000" },
+        { "name": "CHROMA_DB_MINILM_MODEL_NAME", "value": "all-MiniLM-L6-v2" },
+        { "name": "CHROMA_DB_MINILM_COLLECTION_NAME", "value": "cves_minilm" },
+        { "name": "S3_BUCKET", "value": "cve-rag-pipline-bucket" },
+        { "name": "S3_PREFIX", "value": "cves/2025/31xxx/" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/chroma-indexer",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
